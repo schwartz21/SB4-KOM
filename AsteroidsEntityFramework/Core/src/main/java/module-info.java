@@ -1,13 +1,11 @@
 module Core {
     exports dk.sdu.mmmi.cbse.main;
 
+    requires Common;
     requires fps;
     requires spring.core;
     requires spring.context;
     requires spring.beans;
-    requires Common;
-    requires CommonAsteroid;
-    requires CommonBullet;
 
     opens dk.sdu.mmmi.cbse.main to spring.core;
 

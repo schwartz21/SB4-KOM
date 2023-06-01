@@ -18,6 +18,7 @@ import static dk.sdu.mmmi.cbse.common.data.GameKeys.*;
  *
  * @author jcs
  */
+@SuppressWarnings({"unchecked", "FieldMayBeFinal", "FieldCanBeLocal"})
 public class PlayerControlSystem implements IEntityProcessingService {
     private Instant lastBulletFiredTime = Instant.now();
     private int shootDelay = 1; // In seconds
