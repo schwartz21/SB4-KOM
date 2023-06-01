@@ -19,44 +19,44 @@ import static org.mockito.Mockito.*;
 class PlayerControlSystemTest {
     @Test()
     void process() {
-        // Create a Mockplayer
+        // Create a TestPlayer
         Player underlyingPlayer = new Player();
-        Player mockPlayer = mock(Player.class);
-        MovingPart mockMovingPart = mock(MovingPart.class);
+        Player testPlayer = mock(Player.class);
+        MovingPart testMovingPart = mock(MovingPart.class);
 
-        // Configure the mockPlayer
-        when(mockPlayer.getPart(MovingPart.class)).thenReturn(mockMovingPart);
-        when(mockPlayer.getPart(PositionPart.class))
+        // Configure the testPlayer
+        when(testPlayer.getPart(MovingPart.class)).thenReturn(testMovingPart);
+        when(testPlayer.getPart(PositionPart.class))
                 .thenReturn(underlyingPlayer.getPart(PositionPart.class));
-        when(mockPlayer.getShapeX()).thenReturn(underlyingPlayer.getShapeX());
-        when(mockPlayer.getShapeY()).thenReturn(underlyingPlayer.getShapeY());
-        when(mockPlayer.getRadius()).thenReturn(underlyingPlayer.getRadius());
-        when(mockPlayer.getID()).thenReturn("1");
+        when(testPlayer.getShapeX()).thenReturn(underlyingPlayer.getShapeX());
+        when(testPlayer.getShapeY()).thenReturn(underlyingPlayer.getShapeY());
+        when(testPlayer.getRadius()).thenReturn(underlyingPlayer.getRadius());
+        when(testPlayer.getID()).thenReturn("1");
 
-        // Create and configure the mockData
-        GameData mockData = mock(GameData.class);
-        GameKeys mockKeys = mock(GameKeys.class);
-        when(mockData.getKeys()).thenReturn(mockKeys);
-        when(mockKeys.isDown(GameKeys.UP)).thenReturn(true);
-        when(mockKeys.isDown(GameKeys.LEFT)).thenReturn(false);
-        when(mockKeys.isDown(GameKeys.RIGHT)).thenReturn(false);
-        when(mockKeys.isDown(GameKeys.DOWN)).thenReturn(false);
+        // Create and configure the testData
+        GameData testData = mock(GameData.class);
+        GameKeys testKeys = mock(GameKeys.class);
+        when(testData.getKeys()).thenReturn(testKeys);
+        when(testKeys.isDown(GameKeys.UP)).thenReturn(true);
+        when(testKeys.isDown(GameKeys.LEFT)).thenReturn(false);
+        when(testKeys.isDown(GameKeys.RIGHT)).thenReturn(false);
+        when(testKeys.isDown(GameKeys.DOWN)).thenReturn(false);
 
-        // Create and configure the mockWorld
-        World world = mock(World.class);
+        // Create and configure the testWorld
+        World testWorld = mock(World.class);
         List<Entity> players = new ArrayList<>();
-        players.add(mockPlayer);
-        when(world.getEntities(Player.class)).thenReturn(players);
+        players.add(testPlayer);
+        when(testWorld.getEntities(Player.class)).thenReturn(players);
 
         // Run the test
         PlayerControlSystem underTest = new PlayerControlSystem();
-        underTest.process(mockData, world);
+        underTest.process(testData, testWorld);
 
         // Verify the results
-        verify(mockPlayer).getPart(MovingPart.class);
-        verify(mockMovingPart).setUp(true);
-        verify(mockMovingPart).setRight(false);
-        verify(mockMovingPart).setLeft(false);
+        verify(testPlayer).getPart(MovingPart.class);
+        verify(testMovingPart).setUp(true);
+        verify(testMovingPart).setRight(false);
+        verify(testMovingPart).setLeft(false);
     }
 }
 
