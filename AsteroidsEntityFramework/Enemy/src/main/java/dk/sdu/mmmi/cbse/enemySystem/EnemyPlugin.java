@@ -14,25 +14,22 @@ public class EnemyPlugin implements IGamePluginService {
     private final int outerSize = 5;
     private final int innerSize = 3;
 
-    public EnemyPlugin() {
-    }
+    public EnemyPlugin() {}
 
     @Override
     public void start(GameData gameData, World world) {
-
-        // Add entities to the world
-        enemy = createEnemyShip(gameData);
-        world.addEntity(enemy);
+        // Add enemies to the world
+        for (int i= 0; i< 5; i++){
+            enemy = createEnemyShip(gameData, 50 * i, 50 * i);
+            world.addEntity(enemy);
+        }
     }
 
-    private Entity createEnemyShip(GameData gameData) {
-
+    private Entity createEnemyShip(GameData gameData, float x, float y) {
         float deceleration = 200;
         float acceleration = 400 + deceleration;
         float maxSpeed = 300;
         float rotationSpeed = 8;
-        float x = gameData.getDisplayWidth() / 2f + 50;
-        float y = gameData.getDisplayHeight() / 2f + 50;
         float radians = (float) Math.PI / 2;
 
         Entity enemyShip = new Enemy(outerSize, innerSize);
@@ -49,5 +46,4 @@ public class EnemyPlugin implements IGamePluginService {
         // Remove entities
         world.removeEntity(enemy);
     }
-
 }
