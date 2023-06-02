@@ -4,16 +4,23 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
-import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
-import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
+import dk.sdu.mmmi.cbse.common.data.entityparts.ColorPart;
+import dk.sdu.mmmi.cbse.common.data.entityparts.SpritePart;
+import dk.sdu.mmmi.cbse.common.serviceInterfaces.IEntityProcessingService;
+import dk.sdu.mmmi.cbse.common.serviceInterfaces.IGamePluginService;
+import dk.sdu.mmmi.cbse.common.serviceInterfaces.IPostEntityProcessingService;
+import dk.sdu.mmmi.cbse.common.services.EntityProcessingService;
+import dk.sdu.mmmi.cbse.common.services.GamePluginService;
+import dk.sdu.mmmi.cbse.common.services.PostEntityProcessingService;
 import dk.sdu.mmmi.cbse.managers.GameInputProcessor;
-import dk.sdu.mmmi.cbse.playersystem.PlayerControlSystem;
-import dk.sdu.mmmi.cbse.playersystem.PlayerPlugin;
-import java.util.ArrayList;
+import dk.sdu.mmmi.cbse.render.SpriteCache;
+
 import java.util.List;
 
 public class Game
@@ -23,18 +30,28 @@ public class Game
     private ShapeRenderer sr;
 
     private final GameData gameData = new GameData();
-    private List<IEntityProcessingService> entityProcessors = new ArrayList<>();
-    private List<IGamePluginService> entityPlugins = new ArrayList<>();
-    private World world = new World();
+    private final World world = new World();
+
+    private final SpriteCache spriteCache = new SpriteCache();
+
+    List<IGamePluginService> gamePlugins;
+    List<IEntityProcessingService> processingServices;
+    List<IPostEntityProcessingService> postProcessingServices;
+
+
+    public Game(List<IGamePluginService> gamePlugins, List<IEntityProcessingService> processingServices, List<IPostEntityProcessingService> postProcessingServices) {
+        this.gamePlugins = gamePlugins;
+        this.processingServices = processingServices;
+        this.postProcessingServices = postProcessingServices;
+    }
 
     @Override
     public void create() {
-
         gameData.setDisplayWidth(Gdx.graphics.getWidth());
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
 
         cam = new OrthographicCamera(gameData.getDisplayWidth(), gameData.getDisplayHeight());
-        cam.translate(gameData.getDisplayWidth() / 2, gameData.getDisplayHeight() / 2);
+        cam.translate(gameData.getDisplayWidth() / 2f, gameData.getDisplayHeight() / 2f);
         cam.update();
 
         sr = new ShapeRenderer();
@@ -43,15 +60,7 @@ public class Game
                 new GameInputProcessor(gameData)
         );
 
-        IGamePluginService playerPlugin = new PlayerPlugin();
-
-        IEntityProcessingService playerProcess = new PlayerControlSystem();
-        entityPlugins.add(playerPlugin);
-        entityProcessors.add(playerProcess);
-        // Lookup all Game Plugins using ServiceLoader
-        for (IGamePluginService iGamePlugin : entityPlugins) {
-            iGamePlugin.start(gameData, world);
-        }
+        GamePluginService.getInstance().startAll(gameData, world);
     }
 
     @Override
@@ -71,16 +80,33 @@ public class Game
     }
 
     private void update() {
-        // Update
-        for (IEntityProcessingService entityProcessorService : entityProcessors) {
-            entityProcessorService.process(gameData, world);
-        }
+        EntityProcessingService.getInstance().processAll(gameData, world);
+        PostEntityProcessingService.getInstance().processAll(gameData, world);
     }
 
     private void draw() {
+        SpriteBatch batch = new SpriteBatch();
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         for (Entity entity : world.getEntities()) {
+            ColorPart colorPart = entity.getPart(ColorPart.class);
 
-            sr.setColor(1, 1, 1, 1);
+            SpritePart imgPart = entity.getPart(SpritePart.class);
+            if (imgPart != null){
+                Sprite sprite = spriteCache.getSprite(imgPart);
+
+                float x = entity.getShapeX()[0];
+                float y = entity.getShapeY()[0];
+
+//                Gdx.gl.glClearColor((float) colorPart.getR(), (float) colorPart.getG(), (float) colorPart.getB(), (float) colorPart.getA());
+
+                sprite.setCenter(x, y);
+                batch.begin();
+                sprite.draw(batch);
+                batch.end();
+            }
+
+
+            sr.setColor((float) colorPart.getR(), (float) colorPart.getG(), (float) colorPart.getB(), (float) colorPart.getA());
 
             sr.begin(ShapeRenderer.ShapeType.Line);
 
@@ -100,6 +126,8 @@ public class Game
 
     @Override
     public void resize(int width, int height) {
+        gameData.setDisplayWidth(Gdx.graphics.getWidth());
+        gameData.setDisplayHeight(Gdx.graphics.getHeight());
     }
 
     @Override
@@ -112,5 +140,6 @@ public class Game
 
     @Override
     public void dispose() {
+        GamePluginService.getInstance().stopAll(gameData, world);
     }
 }

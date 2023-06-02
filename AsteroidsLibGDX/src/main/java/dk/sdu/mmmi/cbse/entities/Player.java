@@ -17,18 +17,18 @@ public class Player extends SpaceObject {
 
     public Player() {
 
-        x = Game.WIDTH / 2;
-        y = Game.HEIGHT / 2;
+        x = Game.WIDTH / 2f;
+        y = Game.HEIGHT / 2f;
 
         maxSpeed = 300;
-        acceleration = 200;
-        deceleration = 10;
+        acceleration = 600;
+        deceleration = 200;
 
         shapex = new float[4];
         shapey = new float[4];
 
         radians = 3.1415f / 2;
-        rotationSpeed = 3;
+        rotationSpeed = 5;
 
     }
 
@@ -59,6 +59,9 @@ public class Player extends SpaceObject {
     }
 
     public void update(float dt) {
+
+//        System.out.println(radians % (Math.PI * 2));
+
 
         // turning
         if (left) {

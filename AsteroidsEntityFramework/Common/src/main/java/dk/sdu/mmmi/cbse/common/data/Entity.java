@@ -1,6 +1,8 @@
 package dk.sdu.mmmi.cbse.common.data;
 
 import dk.sdu.mmmi.cbse.common.data.entityparts.EntityPart;
+import dk.sdu.mmmi.cbse.common.data.entityparts.LifePart;
+
 import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
@@ -56,5 +58,17 @@ public class Entity implements Serializable {
 
     public void setShapeY(float[] shapeY) {
         this.shapeY = shapeY;
+    }
+
+    public void handleCollision(Entity other, World world){
+        world.removeEntity(other);
+    }
+
+    /**
+     * Sets hit to true on the lifepart
+     */
+    public void damage(){
+        LifePart lifePart = getPart(LifePart.class);
+        lifePart.setIsHit(true);
     }
 }

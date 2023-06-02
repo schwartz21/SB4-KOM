@@ -13,9 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class World {
 
     private final Map<String, Entity> entityMap = new ConcurrentHashMap<>();
+    private List<Entity> entityList = new ArrayList<>();
 
     public String addEntity(Entity entity) {
         entityMap.put(entity.getID(), entity);
+        entityList = new ArrayList<>(getEntities());
         return entity.getID();
     }
 
@@ -35,7 +37,7 @@ public class World {
         List<Entity> r = new ArrayList<>();
         for (Entity e : getEntities()) {
             for (Class<E> entityType : entityTypes) {
-                if (entityType.equals(e.getClass())) {
+                if (entityType.isInstance(e)) {
                     r.add(e);
                 }
             }
@@ -45,6 +47,10 @@ public class World {
 
     public Entity getEntity(String ID) {
         return entityMap.get(ID);
+    }
+
+    public List<Entity> getEntityList(){
+        return entityList;
     }
 
 }
